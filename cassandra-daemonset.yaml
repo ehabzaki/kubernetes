@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    name: cassandra
+  name: cassandra
+spec:
+  template:
+    metadata:
+      labels:
+        app: cassandra
+    spec:
+      containers:
+        - env:
+            - name: HEAP_NEWSIZE
+              value: 512M
+            - name: MAX_HEAP_SIZE
+              value: 100M
+            - name: CASSANDRA_RACK
+              value: "Rack-1" 
+            - name: CASSANDRA_DC
+              value: "West-Europe"
+            - name: CASSANDRA_SEED_DISCOVERY
+              value: ehab-node1
+            - name: CASSANDRA_AUTO_BOOTSTRAP
+              value: "false"
+          image: cassandra
+          name: cassandra
+          ports:
+            - containerPort: 7000
+              name: intra-node
+            - containerPort: 7001
+              name: tls-intra-node
+            - containerPort: 7199
+              name: jmx
+            - containerPort: 9042
+              name: cql
+          volumeMounts:
+            - mountPath: /var/lib/cassandra/data
+              name: data
+      volumes:
+        - name: data
+          hostPath:
+            path: "/data/cassandra"
+      nodeSelector:
+        test: "cassandra"
+
